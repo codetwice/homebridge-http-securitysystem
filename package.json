@@ -1,8 +1,8 @@
 {
-  "name": "homebridge-readablehttp",
-  "version": "0.0.4",
-  "description": "https plugin for homebridge: https://github.com/nfarina/homebridge, with readable state",
-  "license": "0BSD",
+  "name": "homebridge-http-securitysystem",
+  "version": "0.1.0",
+  "description": "HTTP based SecuritySystem plugin for homebridge: https://github.com/nfarina/homebridge, with readable state",
+  "license": "BSD-2-Clause",
   "keywords": [
     "homebridge-plugin"
   ],
@@ -10,30 +10,22 @@
     "node": ">=0.12.0",
     "homebridge": ">=0.2.0"
   },
-  "author": {
-    "name": "Adrian Rudman"
-  },
+  "author": "Marcell Toth",
   "contributors": [
-    {
-      "name": "Matt Harris"
-    }
+    ""
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/mattharris5/homebridge-readablehttp.git"
+    "url": "git://github.com/codetwice/homebridge-http-securitysystem.git"
   },
   "dependencies": {
     "request": "^2.65.0"
   },
-  "readme": "# homebridge-readablehttp\n\nSupports https devices on the HomeBridge Platform and provides a readable callback for getting the \"On\" characteristic to Homekit.\n\n# Installation\n\n1. Install homebridge using: npm install -g homebridge\n2. Install this plugin using: npm install -g homebridge-readablehttp\n3. Update your configuration file. See sample-config.json in this repository for a sample. \n\n# Configuration\n\nThe configuration for this plugin is the same as [homebridge-http](https://github.com/rudders/homebridge-http) but includes an additional method to read the power state of the device. Specify the `read_url` in your config.js that returns the status of the device as an integer (0 = off, 1 = on).\n\nConfiguration sample:\n\n ```\n\"accessories\": [\n    {\n\t\"accessory\": \"Http\",\n\t\"name\": \"Kitchen Lamp\",\n\t\"on_url\": \"https://192.168.1.22:3030/devices/23222/on\",\n\t\"on_body\": \"{\\\"state\\\":\\\"On\\\"}\",\n\t\"off_url\": \"https://192.168.1.22:3030/devices/23222/off\",\n\t\"off_body\": \"{\\\"state\\\":\\\"Off\\\"}\",\n\t\"read_url\": \"https://192.168.1.22:3030/devices/23222/status\",\n\t\"brightness_url\": \"https://192.168.1.22:3030/devices/23222/brightness/%b\",\n\t\"username\": \"\",\n\t\"password\": \"\",\n\t\"sendimmediately\": \"\",\n\t\"http_method\": \"POST\",\n\t\"http_brightness_method\": \"POST\",       \n\t\"service\": \"Switch\",\n\t\"brightnessHandling\": \"no\"\n    }\n]\n\n```\n",
   "readmeFilename": "README.md",
   "bugs": {
-    "url": "https://github.com/mattharris5/homebridge-readablehttp/issues"
+    "url": "https://github.com/codetwice/homebridge-http-securitysystem/issues"
   },
-  "_id": "homebridge-readablehttp@0.0.4",
-  "dist": {
-    "shasum": "bc0fd06739f3f0cb4caed6cfd86fce291df97ab1"
-  },
-  "_from": "homebridge-readablehttp@",
-  "_resolved": "https://registry.npmjs.org/homebridge-readablehttp/-/homebridge-readablehttp-0.0.4.tgz"
+  "main": "index.js",
+  "scripts": {
+  }
 }

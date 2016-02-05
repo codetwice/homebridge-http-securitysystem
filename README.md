@@ -16,7 +16,7 @@ You can find a sample configuration file in this repository.
 
 The configuration options are the following:
 
-Configuration expample with explanation
+Configuration example with explanation
 
 ```
     "accessories": [
