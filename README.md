@@ -42,16 +42,16 @@ Configuration expample with explanation
 
 ```
 
-The **name** parameter determines the name of the security system you will see in HomeKit.
-The **auth** configuration can be used to specify the username and password if the remote webserver requires HTTP authentication. 
-The **http_method** can be either "GET" or "POST". The HTTP requests going to the target webserver will be using this method.
-The **urls section** configures the URLs that are to be called on certain events. 
-- The **stay**, **away** and **night** URLs are called when HomeKit is instructed to arm the alarm (it has 3 different alarm on states)
-- The **disarm** URL is used when HomeKit is instructed to disarm the alarm
-- The **readCurrentState** and **readTargetState** are used by HomeKit for querying the current state of the alarm device. It should return the following values in the body of the HTTP response:
-  - **"0"**: stay armed
-  - **"1"**: away armed
-  - **"2"**: night armed
-  - **"3"**: disarmed
-  - **"4"**: alarm has been triggered
+- The **name** parameter determines the name of the security system you will see in HomeKit.
+- The **auth** configuration can be used to specify the username and password if the remote webserver requires HTTP authentication. 
+- The **http_method** can be either "GET" or "POST". The HTTP requests going to the target webserver will be using this method.
+- The **urls section** configures the URLs that are to be called on certain events. 
+  - The **stay**, **away** and **night** URLs are called when HomeKit is instructed to arm the alarm (it has 3 different alarm on states)
+  - The **disarm** URL is used when HomeKit is instructed to disarm the alarm
+  - The **readCurrentState** and **readTargetState** are used by HomeKit for querying the current state of the alarm device. It should return the following values in the body of the HTTP response:
+    - **"0"**: stay armed
+    - **"1"**: away armed
+    - **"2"**: night armed
+    - **"3"**: disarmed
+    - **"4"**: alarm has been triggered
 
