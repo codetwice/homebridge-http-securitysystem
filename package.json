@@ -4,7 +4,9 @@
   "description": "HTTP based SecuritySystem plugin for homebridge: https://github.com/nfarina/homebridge, with readable state",
   "license": "BSD-2-Clause",
   "keywords": [
-    "homebridge-plugin"
+    "homebridge-plugin",
+    "homebridge",
+    "homekit"
   ],
   "engines": {
     "node": ">=0.12.0",
