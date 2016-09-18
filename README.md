@@ -34,7 +34,7 @@ Configuration example with explanation
                 "away": { "url": "http://localhost:1880/alarm/arm", "body": "away" },
                 "night": { "url": "http://localhost:1880/alarm/arm", "body": "night" },
                 "disarm": { "url": "http://localhost:1880/alarm/disarm", "body": "" },
-                "readCurrentState": { "url": "http://localhost:1880/alarm/check", "body": "" }
+                "readCurrentState": { "url": "http://localhost:1880/alarm/check", "body": "" },
                 "readTargetState": { "url": "http://localhost:1880/alarm/check", "body": "" }
             }
         }
