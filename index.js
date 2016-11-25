@@ -29,12 +29,12 @@ function HttpSecuritySystemAccessory(log, config) {
 			body: config.urls.disarm.body
 		},
 		readCurrentState: {
-			url: config.urls.read.url,
-			body: config.urls.read.body
+			url: config.urls.readCurrentState.url,
+			body: config.urls.readCurrentState.body
 		},
 		readTargetState: {
-			url: config.urls.read.url,
-			body: config.urls.read.body
+			url: config.urls.readTargetState.url,
+			body: config.urls.readTargetState.body
 		}
 	};
 	
