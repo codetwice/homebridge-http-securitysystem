@@ -14,37 +14,35 @@ function HttpSecuritySystemAccessory(log, config) {
 	this.urls = {
 		stay: {
 			url: config.urls.stay.url,
-			body: config.urls.stay.body
+			body: config.urls.stay.body || ""
 		},
 		away: {
 			url: config.urls.away.url,
-			body: config.urls.away.body
+			body: config.urls.away.body || ""
 		},
 		night: {
 			url: config.urls.night.url,
-			body: config.urls.night.body
+			body: config.urls.night.body || ""
 		},
 		disarm: {
 			url: config.urls.disarm.url,
-			body: config.urls.disarm.body
+			body: config.urls.disarm.body || ""
 		},
 		readCurrentState: {
-			url: config.urls.readCurrentState.url,
-			body: config.urls.readCurrentState.body
+			url: config.urls.read.url,
+			body: config.urls.read.body || ""
 		},
 		readTargetState: {
-			url: config.urls.readTargetState.url,
-			body: config.urls.readTargetState.body
+			url: config.urls.read.url,
+			body: config.urls.read.body || ""
 		}
 	};
 	
 	this.httpMethod = config["http_method"] || "GET";
-	this.auth = {
-		username: config.auth.username,
-		password: config.auth.password,
-		immediately: config.auth.immediately
-	},
-	
+	this.auth = {};
+	this.auth.username = config.username || "";
+	this.auth.password = config.password || "";
+	this.auth.immediately = config.immediately || "true";	
 	this.name = config["name"];
 }
 
@@ -67,8 +65,8 @@ HttpSecuritySystemAccessory.prototype = {
 
 	setTargetState: function(state, callback) {
 		this.log("Setting state to %s", state);
+		var self = this;
 		var cfg = null;
-		
 		switch (state) {
 			case Characteristic.SecuritySystemTargetState.STAY_ARM:
 				cfg = this.urls.stay;
@@ -86,7 +84,6 @@ HttpSecuritySystemAccessory.prototype = {
 		
 		var url = cfg.url;
 		var body = cfg.body;
-		
 		if (url) {
 			this.httpRequest(url, body, function(error, response, responseBody) {
 				if (error) {
@@ -94,6 +91,7 @@ HttpSecuritySystemAccessory.prototype = {
 					callback(error);
 				} else {
 					this.log('SetState function succeeded!');
+					self.securityService.setCharacteristic(Characteristic.SecuritySystemCurrentState, state);
 					callback(error, response, state);
 				}
 			}.bind(this));
@@ -125,7 +123,7 @@ HttpSecuritySystemAccessory.prototype = {
 	},
 	getTargetState: function(callback) {
 		this.log("Getting target state");
-		this.getState(this.urls.readTargetState.url, this.urls.readTargetState.body, callback);
+		this.getState(this.urls.readCurrentState.url, this.urls.readCurrentState.body, callback);
 	},
 	identify: function(callback) {
 		this.log("Identify requested!");
@@ -133,17 +131,17 @@ HttpSecuritySystemAccessory.prototype = {
 	},
 
 	getServices: function() {
-		var securityService = new Service.SecuritySystem(this.name);
+        	this.securityService = new Service.SecuritySystem(this.name);
 
-		securityService
-			.getCharacteristic(Characteristic.SecuritySystemCurrentState)
-			.on('get', this.getCurrentState.bind(this));
+        	this.securityService
+            		.getCharacteristic(Characteristic.SecuritySystemCurrentState)
+            		.on('get', this.getCurrentState.bind(this));
 
-		securityService
-			.getCharacteristic(Characteristic.SecuritySystemTargetState)
-			.on('get', this.getTargetState.bind(this))
-			.on('set', this.setTargetState.bind(this));
+        	this.securityService
+            		.getCharacteristic(Characteristic.SecuritySystemTargetState)
+            		.on('get', this.getTargetState.bind(this))
+            		.on('set', this.setTargetState.bind(this));
 
-		return [securityService];
-	}
+        	return [this.securityService];
+    	}
 };

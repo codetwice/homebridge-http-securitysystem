@@ -23,19 +23,16 @@ Configuration example with explanation
         {
             "accessory": "Http-SecuritySystem",
             "name": "Home security",
-            "auth": {	
-                "username": ""
-                "password": "",
-                "immediately": false
-            },
-            "http_method": "POST",
+            "username": "",
+            "password": "",
+            "immediately": false
+            "http_method": "GET",
             "urls": {
-                "stay": { "url": "http://localhost:1880/alarm/arm", "body": "stay" },
-                "away": { "url": "http://localhost:1880/alarm/arm", "body": "away" },
-                "night": { "url": "http://localhost:1880/alarm/arm", "body": "night" },
+                "stay": { "url": "http://localhost:1880/alarm/arm/stay", "body": "" },
+                "away": { "url": "http://localhost:1880/alarm/arm/away", "body": "" },
+                "night": { "url": "http://localhost:1880/alarm/arm/night", "body": "" },
                 "disarm": { "url": "http://localhost:1880/alarm/disarm", "body": "" },
-                "readCurrentState": { "url": "http://localhost:1880/alarm/check", "body": "" },
-                "readTargetState": { "url": "http://localhost:1880/alarm/check", "body": "" }
+                "read": { "url": "http://localhost:1880/alarm/check", "body": "" }
             }
         }
     ]
@@ -43,7 +40,7 @@ Configuration example with explanation
 ```
 
 - The **name** parameter determines the name of the security system you will see in HomeKit.
-- The **auth** configuration can be used to specify the username and password if the remote webserver requires HTTP authentication. 
+- The **username/password** configuration can be used to specify the username and password if the remote webserver requires HTTP authentication. 
 - The **http_method** can be either "GET" or "POST". The HTTP requests going to the target webserver will be using this method.
 - The **urls section** configures the URLs that are to be called on certain events. 
   - The **stay**, **away** and **night** URLs are called when HomeKit is instructed to arm the alarm (it has 3 different alarm on states)
