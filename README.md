@@ -25,7 +25,7 @@ Configuration example with explanation
             "name": "Home security",
             "username": "",
             "password": "",
-            "immediately": false
+            "immediately": false,
             "http_method": "GET",
             "urls": {
                 "stay": { "url": "http://localhost:1880/alarm/arm/stay", "body": "" },
