@@ -30,11 +30,11 @@ function HttpSecuritySystemAccessory(log, config) {
 		},
 		readCurrentState: {
 			url: config.urls.read.url,
-			body: config.urls.read.body || ""
+			body: config.urls.readCurrentState.body || ""
 		},
 		readTargetState: {
 			url: config.urls.read.url,
-			body: config.urls.read.body || ""
+			body: config.urls.readTargetState.body || ""
 		}
 	};
 	
@@ -123,7 +123,7 @@ HttpSecuritySystemAccessory.prototype = {
 	},
 	getTargetState: function(callback) {
 		this.log("Getting target state");
-		this.getState(this.urls.readCurrentState.url, this.urls.readCurrentState.body, callback);
+		this.getState(this.urls.readTargetState.url, this.urls.readTargetState.body, callback);
 	},
 	identify: function(callback) {
 		this.log("Identify requested!");
