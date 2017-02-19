@@ -9,23 +9,22 @@
     "description": "This is an example configuration file with one fake accessory and one fake platform. You can use this as a template for creating your own configuration file containing devices you actually own.",
 
     "accessories": [
-	{
-	    "accessory": "Http-SecuritySystem",
-	    "name": "Home security",
-	    "auth": {
-		"username": "",
-		"password": "",
-		"immediately": false
-	    },
-	    "http_method": "POST",
-	    "urls": {
-		"stay": { "url": "http://localhost:1880/alarm/arm", "body": "stay" },
-		"away": { "url": "http://localhost:1880/alarm/arm", "body": "away" },
-		"night": { "url": "http://localhost:1880/alarm/arm", "body": "night" },
-		"disarm": { "url": "http://localhost:1880/alarm/disarm", "body": "" },
-		"readCurrentState": { "url": "http://localhost:1880/alarm/check", "body": "" },
-		"readTargetState": { "url": "http://localhost:1880/alarm/check", "body": "" }
-	    }
-	}
+        {
+            "accessory": "Http-SecuritySystem",
+            "name": "Home security",
+            "username": "",
+            "password": "",
+            "immediately": false,
+            "http_method": "GET",
+            "urls": {
+                "stay": { "url": "http://localhost:1880/alarm/arm/stay", "body": "" },
+                "away": { "url": "http://localhost:1880/alarm/arm/away", "body": "" },
+                "night": { "url": "http://localhost:1880/alarm/arm/night", "body": "" },
+                "disarm": { "url": "http://localhost:1880/alarm/disarm", "body": "" },
+                "readCurrentState": { "url": "http://localhost:1880/alarm/check", "body": "" },
+                "readTargetState": { "url": "http://localhost:1880/alarm/check", "body": "" }
+            }
+        }
     ]
+
 }
