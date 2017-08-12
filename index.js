@@ -39,10 +39,11 @@ function HttpSecuritySystemAccessory(log, config) {
 	};
 	
 	this.httpMethod = config["http_method"] || "GET";
-	this.auth = {};
-	this.auth.username = config.username || "";
-	this.auth.password = config.password || "";
-	this.auth.immediately = config.immediately || "true";	
+	this.auth = {
+		username: config.username || "",
+		password: config.password || "",
+		immediately: config.immediately || "true"
+	};
 	this.name = config["name"];
 }
 
@@ -56,6 +57,9 @@ HttpSecuritySystemAccessory.prototype = {
 				user: this.auth.username,
 				pass: this.auth.password,
 				sendImmediately: this.auth.immediately
+			},
+			headers: { 
+				Authorization: "Basic " + new Buffer(this.auth.username + ":" + this.auth.password).toString("base64") 
 			}
 		},
 		function(error, response, body) {
@@ -87,10 +91,10 @@ HttpSecuritySystemAccessory.prototype = {
 		if (url) {
 			this.httpRequest(url, body, function(error, response, responseBody) {
 				if (error) {
-					this.log('SetState function failed: %s', error.message);
+					this.log("SetState function failed: %s", error.message);
 					callback(error);
 				} else {
-					this.log('SetState function succeeded!');
+					this.log("SetState function succeeded!");
 					self.securityService.setCharacteristic(Characteristic.SecuritySystemCurrentState, state);
 					callback(error, response, state);
 				}
@@ -107,7 +111,7 @@ HttpSecuritySystemAccessory.prototype = {
 		
 		this.httpRequest(url, body, function(error, response, responseBody) {
 			if (error) {
-				this.log('GetState function failed: %s', error.message);
+				this.log("GetState function failed: %s", error.message);
 				callback(error);
 			} else {
 				var state = parseInt(responseBody);
@@ -127,21 +131,20 @@ HttpSecuritySystemAccessory.prototype = {
 	},
 	identify: function(callback) {
 		this.log("Identify requested!");
-		callback(); // success
+		callback();
 	},
-
 	getServices: function() {
-        	this.securityService = new Service.SecuritySystem(this.name);
+		this.securityService = new Service.SecuritySystem(this.name);
 
-        	this.securityService
-            		.getCharacteristic(Characteristic.SecuritySystemCurrentState)
-            		.on('get', this.getCurrentState.bind(this));
+		this.securityService
+				.getCharacteristic(Characteristic.SecuritySystemCurrentState)
+				.on("get", this.getCurrentState.bind(this));
 
-        	this.securityService
-            		.getCharacteristic(Characteristic.SecuritySystemTargetState)
-            		.on('get', this.getTargetState.bind(this))
-            		.on('set', this.setTargetState.bind(this));
+		this.securityService
+				.getCharacteristic(Characteristic.SecuritySystemTargetState)
+				.on("get", this.getTargetState.bind(this))
+				.on("set", this.setTargetState.bind(this));
 
-        	return [this.securityService];
-    	}
+		return [ this.securityService ];
+	}
 };
