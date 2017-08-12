@@ -1,6 +1,6 @@
 {
   "name": "homebridge-http-securitysystem",
-  "version": "0.1.2",
+  "version": "1.0",
   "description": "HTTP based SecuritySystem plugin for homebridge: https://github.com/nfarina/homebridge, with readable state",
   "license": "BSD-2-Clause",
   "keywords": [
@@ -21,7 +21,9 @@
     "url": "git://github.com/codetwice/homebridge-http-securitysystem.git"
   },
   "dependencies": {
-    "request": "^2.65.0"
+    "request": "^2.65.0",
+    "xmldom": "^0.1.27",
+    "xpath.js": "^1.0.7"
   },
   "readmeFilename": "README.md",
   "bugs": {
