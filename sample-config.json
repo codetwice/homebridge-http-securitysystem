@@ -13,6 +13,8 @@
             "username": "",
             "password": "",
             "immediately": false,
+            "polling": true,
+            "pollInterval": 30000,
             "http_method": "POST",
             "urls": {
                 "stay": { "url": "http://localhost:1880/alarm/arm", "body": "stay" },

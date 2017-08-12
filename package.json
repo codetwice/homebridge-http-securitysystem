@@ -6,7 +6,8 @@
   "keywords": [
     "homebridge-plugin",
     "homebridge",
-    "homekit"
+    "homekit",
+    "security-system"
   ],
   "engines": {
     "node": ">=0.12.0",
@@ -21,6 +22,7 @@
     "url": "git://github.com/codetwice/homebridge-http-securitysystem.git"
   },
   "dependencies": {
+    "polling-to-event": "^2.0.2",
     "request": "^2.65.0",
     "xmldom": "^0.1.27",
     "xpath.js": "^1.0.7"

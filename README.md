@@ -17,6 +17,7 @@ The main function of the module is to proxy HomeKit queries to an arbitrary web 
 - Configurable HTTP endpoints to use for getting/setting the state, including passing parameters in for of GET or in POST body
 - Support for basic HTTP authentication
 - Configurable mapping of API response data to HomeKit SecurityDevice status to allow custom responses
+- Interval polling of the current state to enable real-time notifications even if the security system has been enabled without the use of HomeKit
 
 ## Configuration
 This module requires that the URLs for getting and setting the security system's state are configured correctly. This has to be done in Homebridge's config.json. 
@@ -31,9 +32,12 @@ Configuration example with explanation
         {
             "accessory": "Http-SecuritySystem",
             "name": "Home security",
+            "debug": false,
             "username": "",
             "password": "",
             "immediately": false,
+            "polling": true,
+            "pollInterval": 30000,
             "http_method": "POST",
             "urls": {
                 "stay": { "url": "http://localhost:1880/alarm/arm", "body": "stay" },
@@ -74,6 +78,7 @@ Configuration example with explanation
 
 - The **name** parameter determines the name of the security system you will see in HomeKit.
 - The **username/password** configuration can be used to specify the username and password if the remote webserver requires HTTP authentication. 
+- **debug** turns on debug messages. The important bit is that it reports the mapping process so that it's easier to debug
 - The **http_method** can be either "GET" or "POST". The HTTP requests going to the target webserver will be using this method.
 - The **urls section** configures the URLs that are to be called on certain events. 
   - The **stay**, **away** and **night** URLs are called when HomeKit is instructed to arm the alarm (it has 3 different alarm on states)
@@ -84,6 +89,8 @@ Configuration example with explanation
     - **"2"**: night armed
     - **"3"**: disarmed
     - **"4"**: alarm has been triggered
+- The **polling** is a boolean that specifies if the current state should be pulled on regular intervals or not. Defaults to false.
+- **pollInterval** is a number which defines the poll interval in milliseconds. Defaults to 30000.
 - The **mappings** optional parameter allows the definition of several response mappers. This can be used to translate the response received by readCurrentState and readTargetState to the expect 0...4 range expected by homekit
 
 ## Response mapping
