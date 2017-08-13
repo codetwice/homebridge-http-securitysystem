@@ -1,6 +1,6 @@
 var Service, Characteristic;
 var request = require("request");
-var xpath = require("xpath.js");
+var xpath = require("xpath");
 var dom = require("xmldom").DOMParser;
 var pollingtoevent = require("polling-to-event");
 
@@ -60,9 +60,12 @@ function XPathMapper(parameters) {
 
 	self.map = function(value) {
 		var document = new dom().parseFromString(value);
-		var nodes = xpath(document, this.xpath);
-		if (nodes.length > self.index) {
-			return nodes[self.index].data;
+		var result  = xpath.select(this.xpath, document);
+
+		if (typeof result == "string") {
+			return result;
+		} else if (result instanceof Array && result.length > self.index) {
+			return result[self.index].data;
 		}
 
 		return value;
@@ -176,6 +179,10 @@ HttpSecuritySystemAccessory.prototype.init = function() {
 			self.securityService
 				.getCharacteristic(Characteristic.SecuritySystemCurrentState)
 				.setValue(state);
+		});
+
+		emitter.on("err", function(err) {
+			self.log("Polling failed, error was %s", err);
 		});
 	}
 };
