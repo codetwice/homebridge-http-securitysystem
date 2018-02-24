@@ -232,7 +232,6 @@ HttpSecuritySystemAccessory.prototype.debugLog = function () {
  */
 HttpSecuritySystemAccessory.prototype.setTargetState = function(state, callback) {
 	this.log("Setting state to %s", state);
-	var self = this;
 	var cfg = null;
 	switch (state) {
 		case Characteristic.SecuritySystemTargetState.STAY_ARM:
@@ -258,7 +257,6 @@ HttpSecuritySystemAccessory.prototype.setTargetState = function(state, callback)
 				callback(error);
 			} else {
 				this.log("SetState function succeeded!");
-				self.securityService.setCharacteristic(Characteristic.SecuritySystemCurrentState, state);
 				callback(error, response, state);
 			}
 		}.bind(this));
