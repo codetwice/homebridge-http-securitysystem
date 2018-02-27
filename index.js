@@ -168,21 +168,37 @@ HttpSecuritySystemAccessory.prototype.init = function() {
 	// set up polling if requested
 	if (self.polling) {
 		self.log("Starting polling with an interval of %s ms", self.pollInterval);
-		var emitter = pollingtoevent(function (done) {
-			self.getCurrentState(function (err, result) {
-				done(err, result);
+
+		var emitterConfig = [
+			{
+				method: self.getCurrentState.bind(this),
+				property: 'current state',
+				characteristic: Characteristic.SecuritySystemCurrentState
+			},
+			{
+				method: self.getTargetState.bind(this),
+				logMessage: 'target state',
+				characteristic: Characteristic.SecuritySystemTargetState
+			}
+		];
+
+		emitterConfig.forEach(config => {
+			var emitter = pollingtoevent(function(done) {
+				config.method(function (err, result) {
+					done(err, result);
+				});
+			}, { longpolling: true, interval: self.pollInterval });
+
+			emitter.on("longpoll", function(state) {
+				self.log('Polling noticed %s change to %s, notifying devices', config.property, state);
+				self.securityService
+						.getCharacteristic(config.characteristic)
+						.setValue(state);
 			});
-		}, { longpolling: true, interval: self.pollInterval });
 
-		emitter.on("longpoll", function (state) {
-			self.log("Polling noticed status change to %s, notifying devices", state);
-			self.securityService
-				.getCharacteristic(Characteristic.SecuritySystemCurrentState)
-				.setValue(state);
-		});
-
-		emitter.on("err", function(err) {
-			self.log("Polling failed, error was %s", err);
+			emitter.on("err", function(err) {
+				self.log("Polling of %s failed, error was %s", property, err);
+			});
 		});
 	}
 };
