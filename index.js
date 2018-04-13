@@ -3,6 +3,7 @@ var request = require("request");
 var xpath = require("xpath");
 var dom = require("xmldom").DOMParser;
 var pollingtoevent = require("polling-to-event");
+var _ = require("lodash");
 
 module.exports = function(homebridge){
 	Service = homebridge.hap.Service;
@@ -118,31 +119,15 @@ function HttpSecuritySystemAccessory(log, config) {
 
 	// url info
 	self.urls = {
-		stay: {
-			url: config.urls.stay.url,
-			body: config.urls.stay.body || ""
-		},
-		away: {
-			url: config.urls.away.url,
-			body: config.urls.away.body || ""
-		},
-		night: {
-			url: config.urls.night.url,
-			body: config.urls.night.body || ""
-		},
-		disarm: {
-			url: config.urls.disarm.url,
-			body: config.urls.disarm.body || ""
-		},
-		readCurrentState: {
-			url: config.urls.readCurrentState.url,
-			body: config.urls.readCurrentState.body || ""
-		},
-		readTargetState: {
-			url: config.urls.readTargetState.url,
-			body: config.urls.readTargetState.body || ""
-		}
+		stay: { url: '', body: '' },
+		away: { url: '', body: '' },
+		night: { url: '', body: '' },
+		disarm: { url: '', body: '' },
+		readCurrentState: { url: '', body: '' },
+		readTargetState: { url: '', body: '' }
 	};
+
+	_.merge(self.urls, config.urls);
 
 	self.httpMethod = config["http_method"] || "GET";
 	self.auth = {
@@ -264,21 +249,38 @@ HttpSecuritySystemAccessory.prototype.setTargetState = function(state, callback)
 			break;
 	}
 
-	var url = cfg.url;
-	var body = cfg.body;
-	if (url) {
-		this.httpRequest(url, body, function(error, response) {
-			if (error) {
-				this.log("SetState function failed: %s", error.message);
-				callback(error);
-			} else {
-				this.log("SetState function succeeded!");
-				callback(error, response, state);
-			}
-		}.bind(this));
-	} else {
+	// if the URL is not configured, do not do anything
+	if (cfg == null) {
 		callback(null);
 	}
+
+	// if the config is not an array, convert it to one
+	if (!(cfg instanceof Array)) {
+		cfg = [ cfg ];
+	}
+
+	// call all urls and fire the callbacks when all URLs have returned something
+	var errorToReport = null;
+	var responses = 0;
+
+	cfg.forEach(c => {
+		var url = c.url;
+		var body = c.body;
+		this.httpRequest(url, body, function(error, response) {
+			responses++;
+			if (error) {
+				this.log("SetState function failed (%s returned %s)", url, error.message);
+				errorToReport = error;
+				callback(error);
+			} else {
+				this.log("SetState function succeeded (%s)", url);
+			}
+
+			if (responses == cfg.length) {
+				callback(errorToReport, response, state);
+			}
+		}.bind(this));
+	});
 };
 
 /**
