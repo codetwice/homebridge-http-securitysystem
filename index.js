@@ -264,26 +264,18 @@ HttpSecuritySystemAccessory.prototype.setTargetState = function(state, callback)
 		callback(null);
 	}
 
-	// call all urls and fire the callbacks when all URLs have returned something
-	var errorToReport = null;
-	var responses = 0;
-
 	var url = cfg.url;
 	var body = cfg.body || '';
 	var headers = cfg.headers || {}
 	this.httpRequest(url, body, headers, function(error, response) {
-		responses++;
 		if (error) {
 			this.log("SetState function failed (%s returned %s)", url, error.message);
-			errorToReport = error;
 			callback(error);
 		} else {
 			this.log("SetState function succeeded (%s)", url);
 		}
 
-		if (responses == cfg.length) {
-			callback(errorToReport, response, state);
-		}
+		callback(error, response, state);
 	}.bind(this));
 };
 
