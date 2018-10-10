@@ -45,7 +45,7 @@ Configuration example with explanation
                 "night": { "url": "http://localhost:1880/alarm/arm", "body": "night" },
                 "disarm": { "url": "http://localhost:1880/alarm/disarm", "body": "" },
                 "readCurrentState": { "url": "http://localhost:1880/alarm/check", "body": "" },
-                "readTargetState": { "url": "http://localhost:1880/alarm/check", "body": "" }
+                "readTargetState": { "url": "http://localhost:1880/alarm/check", "body": "", "headers": { "Content-Type", "application/json" } }
             },
             "mappers": [
                 {
@@ -89,17 +89,15 @@ Configuration example with explanation
     - **"2"**: night armed
     - **"3"**: disarmed
     - **"4"**: alarm has been triggered
-  - if you need to call multiple URLs for changing the state, you can pass in an array of URL definitions instead of a single object
 - The **polling** is a boolean that specifies if the current state should be pulled on regular intervals or not. Defaults to false.
 - **pollInterval** is a number which defines the poll interval in milliseconds. Defaults to 30000.
 - The **mappings** optional parameter allows the definition of several response mappers. This can be used to translate the response received by readCurrentState and readTargetState to the expect 0...4 range expected by homekit
 
 ## URL configuration
-When defining URLs in the config, you have to the URL to hit and the body to post to that URL (which can be empty of course). An URL definition can be:
-- either a single object with the **url** and **body** properties
-- or an array of objects with the **url** and **body** properties
-
-If multiple URLs are defined (array form) then the plugin will hit all of them when that particular state is being set. Multiple URLs are only supported for state change purposes, *readCurrentState* and *readTargetState* can only read from a single URL.
+When defining URLs in the config, you have to the URL to hit and the body to post to that URL (which can be empty of course). An URL definition is an object with the following properties:
+- url: the URL to hit
+- body: the request body to send to the URL (optional)
+- headers: an object, of which the property-value pairs will be sent as HTTP headers.
 
 ## Response mapping
 

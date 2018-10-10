@@ -191,27 +191,37 @@ HttpSecuritySystemAccessory.prototype.init = function() {
 /**
  * Method that performs a HTTP request
  *
- * @param url The URL to hit
- * @param body The body of the request
- * @param callback Callback method to call with the result or error (error, response, body)
+ * @param {String} url The URL to hit
+ * @param {String} body The body of the request
+ * @param {Object} headers The HTTP headers to pass along the request
+ * @param {Function} callback Callback method to call with the result or error (error, response, body)
  */
-HttpSecuritySystemAccessory.prototype.httpRequest = function(url, body, callback) {
-	request({
-				url: url,
-				body: body,
-				method: this.httpMethod,
-				auth: {
-					user: this.auth.username,
-					pass: this.auth.password,
-					sendImmediately: this.auth.immediately
-				},
-				headers: {
-					Authorization: "Basic " + new Buffer(this.auth.username + ":" + this.auth.password).toString("base64")
-				}
-			},
-			function(error, response, body) {
-				callback(error, response, body)
-			});
+HttpSecuritySystemAccessory.prototype.httpRequest = function(url, body, headers, callback) {
+	var params = {
+		url: url,
+		body: body,
+		method: this.httpMethod,
+		auth: {
+			user: this.auth.username,
+			pass: this.auth.password,
+			sendImmediately: this.auth.immediately
+		},
+		headers: {}
+	};
+
+	if (this.auth.username) {
+		_.merge(params.headers, {
+			'Authorization': 'Basic ' + new Buffer(this.auth.username + ':' + this.auth.password).toString('base64')
+		});
+	}
+
+	if (headers != null) {
+		_.merge(params.headers, headers);
+	}
+
+	request(params, function(error, response, body) {
+		callback(error, response, body)
+	});
 };
 
 /**
@@ -254,33 +264,27 @@ HttpSecuritySystemAccessory.prototype.setTargetState = function(state, callback)
 		callback(null);
 	}
 
-	// if the config is not an array, convert it to one
-	if (!(cfg instanceof Array)) {
-		cfg = [ cfg ];
-	}
-
 	// call all urls and fire the callbacks when all URLs have returned something
 	var errorToReport = null;
 	var responses = 0;
 
-	cfg.forEach(c => {
-		var url = c.url;
-		var body = c.body;
-		this.httpRequest(url, body, function(error, response) {
-			responses++;
-			if (error) {
-				this.log("SetState function failed (%s returned %s)", url, error.message);
-				errorToReport = error;
-				callback(error);
-			} else {
-				this.log("SetState function succeeded (%s)", url);
-			}
+	var url = cfg.url;
+	var body = cfg.body || '';
+	var headers = cfg.headers || {}
+	this.httpRequest(url, body, headers, function(error, response) {
+		responses++;
+		if (error) {
+			this.log("SetState function failed (%s returned %s)", url, error.message);
+			errorToReport = error;
+			callback(error);
+		} else {
+			this.log("SetState function succeeded (%s)", url);
+		}
 
-			if (responses == cfg.length) {
-				callback(errorToReport, response, state);
-			}
-		}.bind(this));
-	});
+		if (responses == cfg.length) {
+			callback(errorToReport, response, state);
+		}
+	}.bind(this));
 };
 
 /**
@@ -309,16 +313,24 @@ HttpSecuritySystemAccessory.prototype.applyMappers = function(string) {
 /**
  * Gets the state of the security system from a given URL
  *
- * @param {string} url The URL to poke for the result
- * @param {string} body The body of the request
+ * @param {Object} requestConfig The HTTP request configuration
  * @param {Function} callback The method to call with the results
  */
-HttpSecuritySystemAccessory.prototype.getState = function(url, body, callback) {
+HttpSecuritySystemAccessory.prototype.getState = function(requestConfig, callback) {
+	// if the URL is not configured, do not do anything
+	if (requestConfig == null) {
+		callback(null);
+	}
+
+	var url = requestConfig.url;
+	var body = requestConfig.body || '';
+	var headers = requestConfig.headers || {}
+
 	if (!url) {
 		callback(null);
 	}
 
-	this.httpRequest(url, body, function(error, response, responseBody) {
+	this.httpRequest(url, body, headers, function(error, response, responseBody) {
 		if (error) {
 			this.log("getState function failed: %s", error.message);
 			callback(error);
@@ -338,7 +350,7 @@ HttpSecuritySystemAccessory.prototype.getState = function(url, body, callback) {
 HttpSecuritySystemAccessory.prototype.getCurrentState = function(callback) {
 	var self = this;
 	self.debugLog("Getting current state");
-	this.getState(this.urls.readCurrentState.url, this.urls.readCurrentState.body, function(err, state) {
+	this.getState(this.urls.readCurrentState, function(err, state) {
 		if (!err) {
 			self.debugLog("Current state is %s", state);
 			if (self.previousCurrentState !== state) {
@@ -359,11 +371,14 @@ HttpSecuritySystemAccessory.prototype.getCurrentState = function(callback) {
 HttpSecuritySystemAccessory.prototype.getTargetState =  function(callback) {
 	var self = this;
 	self.debugLog("Getting target state");
-	this.getState(this.urls.readTargetState.url, this.urls.readTargetState.body, function(err, state) {
-		self.debugLog("Target state is %s", state);
-		if (self.previousTargetState !== state) {
-			self.previousTargetState = state;
-			self.log("Target state changed to %s", state);
+
+	this.getState(this.urls.readTargetState, function(err, state) {
+		if (!err) {
+			self.debugLog("Target state is %s", state);
+			if (self.previousTargetState !== state) {
+				self.previousTargetState = state;
+				self.log("Target state changed to %s", state);
+			}
 		}
 
 		callback(err, state);
