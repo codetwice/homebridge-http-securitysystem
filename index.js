@@ -162,7 +162,7 @@ HttpSecuritySystemAccessory.prototype.init = function() {
 			},
 			{
 				method: self.getTargetState.bind(this),
-				logMessage: 'target state',
+				property: 'target state',
 				characteristic: Characteristic.SecuritySystemTargetState
 			}
 		];
@@ -181,8 +181,8 @@ HttpSecuritySystemAccessory.prototype.init = function() {
 						.setValue(state);
 			});
 
-			emitter.on("err", function(err) {
-				self.log("Polling of %s failed, error was %s", property, err);
+			emitter.on("error", function(err) {
+				self.log("Polling of %s failed, error was %s", config.property, err);
 			});
 		});
 	}
@@ -197,21 +197,21 @@ HttpSecuritySystemAccessory.prototype.init = function() {
  */
 HttpSecuritySystemAccessory.prototype.httpRequest = function(url, body, callback) {
 	request({
-		url: url,
-		body: body,
-		method: this.httpMethod,
-		auth: {
-			user: this.auth.username,
-			pass: this.auth.password,
-			sendImmediately: this.auth.immediately
-		},
-		headers: {
-			Authorization: "Basic " + new Buffer(this.auth.username + ":" + this.auth.password).toString("base64")
-		}
-	},
-	function(error, response, body) {
-		callback(error, response, body)
-	});
+				url: url,
+				body: body,
+				method: this.httpMethod,
+				auth: {
+					user: this.auth.username,
+					pass: this.auth.password,
+					sendImmediately: this.auth.immediately
+				},
+				headers: {
+					Authorization: "Basic " + new Buffer(this.auth.username + ":" + this.auth.password).toString("base64")
+				}
+			},
+			function(error, response, body) {
+				callback(error, response, body)
+			});
 };
 
 /**
@@ -320,7 +320,7 @@ HttpSecuritySystemAccessory.prototype.getState = function(url, body, callback) {
 
 	this.httpRequest(url, body, function(error, response, responseBody) {
 		if (error) {
-			this.log("GetState function failed: %s", error.message);
+			this.log("getState function failed: %s", error.message);
 			callback(error);
 		} else {
 			var state = responseBody;
@@ -339,10 +339,12 @@ HttpSecuritySystemAccessory.prototype.getCurrentState = function(callback) {
 	var self = this;
 	self.debugLog("Getting current state");
 	this.getState(this.urls.readCurrentState.url, this.urls.readCurrentState.body, function(err, state) {
-		self.debugLog("Current state is %s", state);
-		if (self.previousCurrentState !== state) {
-			self.previousCurrentState = state;
-			self.log("Current state changed to %s", state);
+		if (!err) {
+			self.debugLog("Current state is %s", state);
+			if (self.previousCurrentState !== state) {
+				self.previousCurrentState = state;
+				self.log("Current state changed to %s", state);
+			}
 		}
 
 		callback(err, state);
@@ -387,13 +389,13 @@ HttpSecuritySystemAccessory.prototype.getServices =  function() {
 	this.securityService = new Service.SecuritySystem(this.name);
 
 	this.securityService
-		.getCharacteristic(Characteristic.SecuritySystemCurrentState)
-		.on("get", this.getCurrentState.bind(this));
+			.getCharacteristic(Characteristic.SecuritySystemCurrentState)
+			.on("get", this.getCurrentState.bind(this));
 
 	this.securityService
-		.getCharacteristic(Characteristic.SecuritySystemTargetState)
-		.on("get", this.getTargetState.bind(this))
-		.on("set", this.setTargetState.bind(this));
+			.getCharacteristic(Characteristic.SecuritySystemTargetState)
+			.on("get", this.getTargetState.bind(this))
+			.on("set", this.setTargetState.bind(this));
 
 	return [ this.securityService ];
 };
