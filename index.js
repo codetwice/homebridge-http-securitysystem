@@ -264,19 +264,34 @@ HttpSecuritySystemAccessory.prototype.setTargetState = function(state, callback)
 		callback(null);
 	}
 
-	var url = cfg.url;
-	var body = cfg.body || '';
-	var headers = cfg.headers || {}
-	this.httpRequest(url, body, headers, function(error, response) {
-		if (error) {
-			this.log("SetState function failed (%s returned %s)", url, error.message);
-			callback(error);
-		} else {
-			this.log("SetState function succeeded (%s)", url);
-		}
+	// if the config is not an array, convert it to one
+	if (!(cfg instanceof Array)) {
+		cfg = [ cfg ];
+	}
 
-		callback(error, response, state);
-	}.bind(this));
+	// call all urls and fire the callbacks when all URLs have returned something
+	var errorToReport = null;
+	var responses = 0;
+
+	cfg.forEach(c => {
+		var url = c.url;
+		var body = c.body || '';
+		var headers = c.headers || {}
+		this.httpRequest(url, body, headers, function(error, response) {
+			responses++;
+			if (error) {
+				this.log("SetState function failed (%s returned %s)", url, error.message);
+				errorToReport = error;
+				callback(error);
+			} else {
+				this.log("SetState function succeeded (%s)", url);
+			}
+
+			if (responses == cfg.length) {
+				callback(errorToReport, response, state);
+			}
+		}.bind(this));
+	});
 };
 
 /**

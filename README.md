@@ -89,18 +89,24 @@ Configuration example with explanation
     - **"2"**: night armed
     - **"3"**: disarmed
     - **"4"**: alarm has been triggered
+  - if you need to call multiple URLs for changing the state, you can pass in an array of URL definitions instead of a single object
 - The **polling** is a boolean that specifies if the current state should be pulled on regular intervals or not. Defaults to false.
 - **pollInterval** is a number which defines the poll interval in milliseconds. Defaults to 30000.
 - The **mappings** optional parameter allows the definition of several response mappers. This can be used to translate the response received by readCurrentState and readTargetState to the expect 0...4 range expected by homekit
 
 ## URL configuration
-When defining URLs in the config, you have to the URL to hit and the body to post to that URL (which can be empty of course). An URL definition is an object with the following properties:
-- url: the URL to hit
-- body: the request body to send to the URL (optional)
-- headers: an object, of which the property-value pairs will be sent as HTTP headers.
+When defining URLs in the config, you have to the URL to hit and the body to post to that URL (which can be empty of course). An URL definition can be:
+- either a single configuration object
+- or an array of configuration objects
+
+Each configuration object has the following properties:
+- **url**: the URL to hit
+- **body**: the request body to send to the URL (optional)
+- **headers**: an object, of which the property-value pairs will be sent as HTTP headers.
+
+Multiple endpoints are only supported for the setTargetState endpoint. The other calls always go to a single URL only.
 
 ## Response mapping
-
 The mappings block of the configuration may contain any number of mapper definitions. The mappers are chained after each other,  the result of a mapper is fed into the input of the next mapper. The purpose of this whole chain is to somehow boil down the response received from the API to a single number which is expected by Homekit. 
 
 Each mapper has the following JSON format:
