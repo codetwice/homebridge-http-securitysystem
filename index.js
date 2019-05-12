@@ -289,6 +289,7 @@ HttpSecuritySystemAccessory.prototype.setTargetState = function(state, callback)
 
 			if (responses == cfg.length) {
 				callback(errorToReport, response, state);
+				this.refreshCurrentState();
 			}
 		}.bind(this));
 	});
@@ -391,6 +392,21 @@ HttpSecuritySystemAccessory.prototype.getTargetState =  function(callback) {
 		callback(err, state);
 	});
 };
+
+/**
+ * Refreshes the current state of the security system
+ *
+ * This method forces the plugin to request the current state of the security system and broadcasts it to all listeners.
+ */
+HttpSecuritySystemAccessory.prototype.refreshCurrentState = function() {
+	this.getCurrentState((err, state) => {
+		if (!err) {
+			this.securityService
+					.getCharacteristic(Characteristic.SecuritySystemCurrentState)
+					.setValue(state);
+		}
+	});
+}
 
 /**
  * Identifies the security device (?)
